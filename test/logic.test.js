@@ -186,3 +186,28 @@ test('stage advances after daysToAdvance completed days', () => {
   assert.strictEqual(s.drumProgress.stageIndex, 1, 'advanced after 5 days');
   assert.strictEqual(s.drumProgress.daysInStage, 0);
 });
+
+// --- Task 6: serialize / deserialize / migrate ---
+
+test('serialize/deserialize round-trip', () => {
+  let s = freshState('2026-06-25');
+  s = L.toggleWant(s, '2026-06-25', s.history['2026-06-25'].wants[0].id);
+  const json = L.serialize(s);
+  const r = L.deserialize(json);
+  assert.strictEqual(r.ok, true);
+  assert.deepStrictEqual(r.state, s);
+});
+
+test('deserialize rejects malformed json', () => {
+  assert.strictEqual(L.deserialize('not json').ok, false);
+  assert.strictEqual(L.deserialize('123').ok, false);
+  assert.strictEqual(L.deserialize('null').ok, false);
+});
+
+test('migrate fills defaults for partial objects', () => {
+  const s = L.migrate({ history: { '2026-06-25': { needs: [], wants: [], drum: { completed: false, counted: false, exercises: {} } } } });
+  assert.strictEqual(s.version, 1);
+  assert.deepStrictEqual(s.wantsList, ['Play basketball']);
+  assert.strictEqual(s.drumProgress.stageIndex, 0);
+  assert.strictEqual(s.settings.bonusPerWant, 10);
+});

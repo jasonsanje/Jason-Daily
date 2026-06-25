@@ -168,6 +168,30 @@
     return next;
   }
 
+  function serialize(state) { return JSON.stringify(state, null, 2); }
+  function migrate(raw) {
+    const base = createInitialState();
+    if (!raw || typeof raw !== 'object') return base;
+    const dp = raw.drumProgress && typeof raw.drumProgress === 'object' ? raw.drumProgress : {};
+    return {
+      version: 1,
+      history: (raw.history && typeof raw.history === 'object') ? raw.history : {},
+      wantsList: Array.isArray(raw.wantsList) ? raw.wantsList.slice() : base.wantsList,
+      drumProgress: {
+        stageIndex: Math.max(0, dp.stageIndex | 0),
+        daysInStage: Math.max(0, dp.daysInStage | 0),
+        tempos: (dp.tempos && typeof dp.tempos === 'object') ? dp.tempos : {},
+      },
+      settings: Object.assign({}, base.settings, (raw.settings && typeof raw.settings === 'object') ? raw.settings : {}),
+    };
+  }
+  function deserialize(jsonString) {
+    let raw;
+    try { raw = JSON.parse(jsonString); } catch (e) { return { ok: false, state: null }; }
+    if (!raw || typeof raw !== 'object') return { ok: false, state: null };
+    return { ok: true, state: migrate(raw) };
+  }
+
   const api = {
     KEY, DEFAULT_NEEDS, DEFAULT_SETTINGS,
     dateKey, parseKey, addDays, todayKey,
@@ -175,6 +199,7 @@
     doneNeedsCount, totalNeeds, computeNeedsPct, bonusCount, computeBonus, counterValue, isPerfectDay, computeStreak,
     updateDay, toggleWant, addAdhocNeed, removeNeed, addWant, removeWant,
     exerciseTempo, isWorkoutComplete, nextTempo, setWorkoutComplete, toggleExercise,
+    serialize, migrate, deserialize,
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.Logic = api;
