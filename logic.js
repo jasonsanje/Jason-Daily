@@ -76,11 +76,48 @@
     return streak;
   }
 
+  function updateDay(state, dayKey, fn) {
+    const day = state.history[dayKey];
+    const newDay = fn(JSON.parse(JSON.stringify(day)));
+    const history = Object.assign({}, state.history); history[dayKey] = newDay;
+    return Object.assign({}, state, { history });
+  }
+  function toggleWant(state, dayKey, wantId) {
+    return updateDay(state, dayKey, d => {
+      d.wants = d.wants.map(w => w.id === wantId ? Object.assign({}, w, { done: !w.done }) : w);
+      return d;
+    });
+  }
+  function addAdhocNeed(state, dayKey, label) {
+    const text = (label || '').trim(); if (!text) return state;
+    return updateDay(state, dayKey, d => {
+      d.needs = d.needs.concat([{ id: 'adhoc-' + Date.now(), label: text, done: false, source: 'adhoc' }]);
+      return d;
+    });
+  }
+  function removeNeed(state, dayKey, needId) {
+    return updateDay(state, dayKey, d => { d.needs = d.needs.filter(n => n.id !== needId); return d; });
+  }
+  function addWant(state, dayKey, label) {
+    const text = (label || '').trim(); if (!text) return state;
+    let next = state;
+    if (!next.wantsList.includes(text)) next = Object.assign({}, next, { wantsList: next.wantsList.concat([text]) });
+    return updateDay(next, dayKey, d => {
+      if (!d.wants.some(w => w.label === text)) d.wants = d.wants.concat([{ id: 'w-add-' + Date.now(), label: text, done: false }]);
+      return d;
+    });
+  }
+  function removeWant(state, dayKey, label) {
+    const next = Object.assign({}, state, { wantsList: state.wantsList.filter(l => l !== label) });
+    return updateDay(next, dayKey, d => { d.wants = d.wants.filter(w => w.label !== label); return d; });
+  }
+
   const api = {
     KEY, DEFAULT_NEEDS, DEFAULT_SETTINGS,
     dateKey, parseKey, addDays, todayKey,
     createInitialState, currentStage, seedDay, ensureDay,
     doneNeedsCount, totalNeeds, computeNeedsPct, bonusCount, computeBonus, counterValue, isPerfectDay, computeStreak,
+    updateDay, toggleWant, addAdhocNeed, removeNeed, addWant, removeWant,
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.Logic = api;

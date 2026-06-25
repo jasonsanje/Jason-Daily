@@ -107,3 +107,38 @@ test('computeStreak breaks on a gap', () => {
   };
   assert.strictEqual(L.computeStreak(h, '2026-06-25'), 2);
 });
+
+const C = CURRICULUM;
+function freshState(dayKey) { return L.ensureDay(L.createInitialState(), dayKey, C); }
+
+test('toggleWant flips only that want', () => {
+  let s = freshState('2026-06-25');
+  const wid = s.history['2026-06-25'].wants[0].id;
+  s = L.toggleWant(s, '2026-06-25', wid);
+  assert.strictEqual(s.history['2026-06-25'].wants[0].done, true);
+  s = L.toggleWant(s, '2026-06-25', wid);
+  assert.strictEqual(s.history['2026-06-25'].wants[0].done, false);
+});
+
+test('addAdhocNeed appends a removable need that counts', () => {
+  let s = freshState('2026-06-25');
+  const before = s.history['2026-06-25'].needs.length;
+  s = L.addAdhocNeed(s, '2026-06-25', 'Call mom');
+  const needs = s.history['2026-06-25'].needs;
+  assert.strictEqual(needs.length, before + 1);
+  const added = needs[needs.length - 1];
+  assert.strictEqual(added.label, 'Call mom');
+  assert.strictEqual(added.source, 'adhoc');
+  s = L.removeNeed(s, '2026-06-25', added.id);
+  assert.strictEqual(s.history['2026-06-25'].needs.length, before);
+});
+
+test('addWant/removeWant affect wantsList and today', () => {
+  let s = freshState('2026-06-25');
+  s = L.addWant(s, '2026-06-25', 'Read 10 pages');
+  assert.ok(s.wantsList.includes('Read 10 pages'));
+  assert.ok(s.history['2026-06-25'].wants.some(w => w.label === 'Read 10 pages'));
+  s = L.removeWant(s, '2026-06-25', 'Read 10 pages');
+  assert.ok(!s.wantsList.includes('Read 10 pages'));
+  assert.ok(!s.history['2026-06-25'].wants.some(w => w.label === 'Read 10 pages'));
+});
