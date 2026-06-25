@@ -112,12 +112,69 @@
     return updateDay(next, dayKey, d => { d.wants = d.wants.filter(w => w.label !== label); return d; });
   }
 
+  function exerciseTempo(tempos, exercise) {
+    return (tempos && tempos[exercise.id] != null) ? tempos[exercise.id] : exercise.startBpm;
+  }
+  function isWorkoutComplete(day, stage) {
+    if (!stage.exercises.length) return false;
+    return stage.exercises.every(e => day.drum.exercises[e.id] === true);
+  }
+  function nextTempo(current, increment, maxBpm) {
+    const v = current + increment;
+    return (maxBpm != null) ? Math.min(v, maxBpm) : v;
+  }
+  function applyProgression(state, curriculum) {
+    const dp = JSON.parse(JSON.stringify(state.drumProgress));
+    const stage = currentStage(curriculum, dp.stageIndex);
+    stage.exercises.forEach(e => {
+      if (e.startBpm == null) return;
+      const cur = (dp.tempos[e.id] != null) ? dp.tempos[e.id] : e.startBpm;
+      dp.tempos[e.id] = nextTempo(cur, state.settings.tempoIncrement, e.maxBpm);
+    });
+    dp.daysInStage += 1;
+    if (dp.daysInStage >= stage.daysToAdvance && dp.stageIndex < curriculum.length - 1) {
+      dp.stageIndex += 1; dp.daysInStage = 0;
+    }
+    return dp;
+  }
+  function applyDrumState(state, dayKey, complete, curriculum) {
+    const stage = currentStage(curriculum, state.drumProgress.stageIndex);
+    let progressed = false;
+    let next = updateDay(state, dayKey, d => {
+      stage.exercises.forEach(e => { d.drum.exercises[e.id] = complete; });
+      d.drum.completed = complete;
+      const dn = d.needs.find(n => n.link === 'drum'); if (dn) dn.done = complete;
+      if (complete && !d.drum.counted) { d.drum.counted = true; progressed = true; }
+      return d;
+    });
+    if (progressed) next = Object.assign({}, next, { drumProgress: applyProgression(next, curriculum) });
+    return next;
+  }
+  function setWorkoutComplete(state, dayKey, complete, curriculum) {
+    return applyDrumState(state, dayKey, complete, curriculum);
+  }
+  function toggleExercise(state, dayKey, exerciseId, curriculum) {
+    const stage = currentStage(curriculum, state.drumProgress.stageIndex);
+    let progressed = false;
+    let next = updateDay(state, dayKey, d => {
+      d.drum.exercises[exerciseId] = !d.drum.exercises[exerciseId];
+      const done = stage.exercises.every(e => d.drum.exercises[e.id] === true);
+      d.drum.completed = done;
+      const dn = d.needs.find(n => n.link === 'drum'); if (dn) dn.done = done;
+      if (done && !d.drum.counted) { d.drum.counted = true; progressed = true; }
+      return d;
+    });
+    if (progressed) next = Object.assign({}, next, { drumProgress: applyProgression(next, curriculum) });
+    return next;
+  }
+
   const api = {
     KEY, DEFAULT_NEEDS, DEFAULT_SETTINGS,
     dateKey, parseKey, addDays, todayKey,
     createInitialState, currentStage, seedDay, ensureDay,
     doneNeedsCount, totalNeeds, computeNeedsPct, bonusCount, computeBonus, counterValue, isPerfectDay, computeStreak,
     updateDay, toggleWant, addAdhocNeed, removeNeed, addWant, removeWant,
+    exerciseTempo, isWorkoutComplete, nextTempo, setWorkoutComplete, toggleExercise,
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.Logic = api;

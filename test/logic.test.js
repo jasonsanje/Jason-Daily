@@ -142,3 +142,47 @@ test('addWant/removeWant affect wantsList and today', () => {
   assert.ok(!s.wantsList.includes('Read 10 pages'));
   assert.ok(!s.history['2026-06-25'].wants.some(w => w.label === 'Read 10 pages'));
 });
+
+// --- Task 5: drum workout transitions, tempo progression, stage advancement ---
+
+function stage0Ids() { return C[0].exercises.map(e => e.id); }
+
+test('exerciseTempo falls back to startBpm', () => {
+  assert.strictEqual(L.exerciseTempo({}, { id: 'x', startBpm: 60 }), 60);
+  assert.strictEqual(L.exerciseTempo({ x: 72 }, { id: 'x', startBpm: 60 }), 72);
+});
+
+test('nextTempo respects cap', () => {
+  assert.strictEqual(L.nextTempo(60, 2, 100), 62);
+  assert.strictEqual(L.nextTempo(99, 2, 100), 100);
+  assert.strictEqual(L.nextTempo(60, 2, undefined), 62);
+});
+
+test('toggling all exercises completes the workout and syncs the drum need', () => {
+  let s = freshState('2026-06-25');
+  for (const id of stage0Ids()) s = L.toggleExercise(s, '2026-06-25', id, C);
+  const day = s.history['2026-06-25'];
+  assert.strictEqual(day.drum.completed, true);
+  assert.strictEqual(day.needs.find(n => n.link === 'drum').done, true);
+});
+
+test('setWorkoutComplete(true) bumps tempos and daysInStage once', () => {
+  let s = freshState('2026-06-25');
+  s = L.setWorkoutComplete(s, '2026-06-25', true, C);
+  assert.strictEqual(s.drumProgress.daysInStage, 1);
+  const ex0 = C[0].exercises.find(e => e.startBpm);
+  assert.strictEqual(s.drumProgress.tempos[ex0.id], ex0.startBpm + 2);
+  // toggling off then on again must NOT double-count
+  s = L.setWorkoutComplete(s, '2026-06-25', false, C);
+  s = L.setWorkoutComplete(s, '2026-06-25', true, C);
+  assert.strictEqual(s.drumProgress.daysInStage, 1);
+  assert.strictEqual(s.drumProgress.tempos[ex0.id], ex0.startBpm + 2);
+});
+
+test('stage advances after daysToAdvance completed days', () => {
+  let s = L.createInitialState();
+  const days = ['2026-06-20','2026-06-21','2026-06-22','2026-06-23','2026-06-24'];
+  for (const k of days) { s = L.ensureDay(s, k, C); s = L.setWorkoutComplete(s, k, true, C); }
+  assert.strictEqual(s.drumProgress.stageIndex, 1, 'advanced after 5 days');
+  assert.strictEqual(s.drumProgress.daysInStage, 0);
+});
