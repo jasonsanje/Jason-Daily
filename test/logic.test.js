@@ -48,3 +48,62 @@ test('ensureDay seeds missing day and is immutable', () => {
   const s2 = L.ensureDay(s1, '2026-06-25', CURRICULUM);
   assert.strictEqual(s2.history['2026-06-25'], s1.history['2026-06-25'], 'existing day untouched');
 });
+
+function dayWith(needsDone, wantsDone) {
+  return {
+    needs: needsDone.map((d, i) => ({ id: 'n' + i, label: 'n' + i, done: d })),
+    wants: wantsDone.map((d, i) => ({ id: 'w' + i, label: 'w' + i, done: d })),
+    drum: { completed: false, counted: false, exercises: {} },
+  };
+}
+
+test('computeNeedsPct rounds done/total', () => {
+  assert.strictEqual(L.computeNeedsPct(dayWith([true, true, false, false], [])), 50);
+  assert.strictEqual(L.computeNeedsPct(dayWith([true, true, true], [])), 100);
+  assert.strictEqual(L.computeNeedsPct(dayWith([], [])), 0);
+});
+
+test('bonus and counter', () => {
+  const d = dayWith([true, true, true], [true, true]);
+  assert.strictEqual(L.computeBonus(d, 10), 20);
+  assert.strictEqual(L.counterValue(d, 10), 120);
+  const partial = dayWith([true, false], [true]);
+  assert.strictEqual(L.counterValue(partial, 10), 50);
+});
+
+test('isPerfectDay', () => {
+  assert.strictEqual(L.isPerfectDay(dayWith([true, true], [])), true);
+  assert.strictEqual(L.isPerfectDay(dayWith([true, false], [])), false);
+  assert.strictEqual(L.isPerfectDay(dayWith([], [])), false);
+});
+
+function completedDay(done) {
+  const d = dayWith([true], []); d.drum.completed = done; return d;
+}
+
+test('computeStreak counts consecutive completed days, today anchor', () => {
+  const h = {
+    '2026-06-23': completedDay(true),
+    '2026-06-24': completedDay(true),
+    '2026-06-25': completedDay(true),
+  };
+  assert.strictEqual(L.computeStreak(h, '2026-06-25'), 3);
+});
+
+test('computeStreak uses yesterday anchor when today not done', () => {
+  const h = {
+    '2026-06-23': completedDay(true),
+    '2026-06-24': completedDay(true),
+    '2026-06-25': completedDay(false),
+  };
+  assert.strictEqual(L.computeStreak(h, '2026-06-25'), 2);
+});
+
+test('computeStreak breaks on a gap', () => {
+  const h = {
+    '2026-06-22': completedDay(true),
+    '2026-06-24': completedDay(true),
+    '2026-06-25': completedDay(true),
+  };
+  assert.strictEqual(L.computeStreak(h, '2026-06-25'), 2);
+});

@@ -52,10 +52,35 @@
     return Object.assign({}, state, { history });
   }
 
+  function doneNeedsCount(day) { return day.needs.filter(n => n.done).length; }
+  function totalNeeds(day) { return day.needs.length; }
+  function computeNeedsPct(day) {
+    const t = totalNeeds(day); if (!t) return 0;
+    return Math.round(doneNeedsCount(day) / t * 100);
+  }
+  function bonusCount(day) { return day.wants.filter(w => w.done).length; }
+  function computeBonus(day, bonusPerWant) { return bonusCount(day) * bonusPerWant; }
+  function counterValue(day, bonusPerWant) {
+    const pct = computeNeedsPct(day);
+    return pct >= 100 ? 100 + computeBonus(day, bonusPerWant) : pct;
+  }
+  function isPerfectDay(day) {
+    return day.needs.length > 0 && day.needs.every(n => n.done);
+  }
+  function isDayCompleted(day) { return !!(day && day.drum && day.drum.completed); }
+  function computeStreak(history, todayK) {
+    let cur = parseKey(todayK);
+    if (!isDayCompleted(history[todayK])) cur = addDays(cur, -1);
+    let streak = 0;
+    while (isDayCompleted(history[dateKey(cur)])) { streak++; cur = addDays(cur, -1); }
+    return streak;
+  }
+
   const api = {
     KEY, DEFAULT_NEEDS, DEFAULT_SETTINGS,
     dateKey, parseKey, addDays, todayKey,
     createInitialState, currentStage, seedDay, ensureDay,
+    doneNeedsCount, totalNeeds, computeNeedsPct, bonusCount, computeBonus, counterValue, isPerfectDay, computeStreak,
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.Logic = api;
