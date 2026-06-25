@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Jason Daily</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#EFE5D4; --card:#FFFFFF; --ink:#4B4139; --muted:#9C8E7F; --faint:#C0AE9A;
+    --line:#EFE5D4; --line2:#EBDECB;
+    --coral:#F2A07B; --gold:#F6C56B; --green:#6FBF93; --green2:#9FD3B4;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:linear-gradient(180deg,#FBF6EE 0%,#F2E8D8 100%);min-height:100vh;
+    font-family:'Nunito',system-ui,-apple-system,sans-serif;color:var(--ink)}
+  .wrap{max-width:1180px;margin:0 auto;padding:26px 20px 80px}
+  .fred{font-family:'Fredoka',system-ui,sans-serif}
+  .grad{background:linear-gradient(135deg,var(--coral),var(--gold))}
+  .gradg{background:linear-gradient(135deg,var(--green),var(--green2))}
+  button{font-family:inherit}
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:26px;flex-wrap:wrap}
+  .brand{display:flex;align-items:center;gap:14px}
+  .logo{width:48px;height:48px;border-radius:15px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 18px -8px rgba(242,160,123,.9)}
+  .logo span{width:22px;height:22px;border-radius:50%;border:3px solid #fff;display:block}
+  .eyebrow{font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+  .h1{font-weight:700;font-size:26px;line-height:1.1}
+  .nav{display:flex;gap:5px;background:#FFFDF8;border:1.5px solid var(--line2);border-radius:16px;padding:5px}
+  .nav button{border:none;background:transparent;cursor:pointer;border-radius:12px;padding:9px 18px;font-size:15px;font-weight:600;color:#A99A86}
+  .nav button.active{color:#fff}
+  .iconbtn{width:46px;height:46px;border-radius:14px;border:1.5px solid var(--line2);background:#FFFDF8;cursor:pointer;display:flex;align-items:center;justify-content:center}
+  .menu{position:absolute;right:0;top:54px;width:220px;background:#FFFDF8;border:1.5px solid var(--line2);border-radius:18px;padding:10px;box-shadow:0 18px 40px -18px rgba(100,70,40,.5);z-index:30}
+  .menu button{width:100%;text-align:left;border:none;background:#F6EFE2;border-radius:12px;padding:11px 12px;font-weight:700;font-size:14px;color:var(--ink);cursor:pointer;margin-bottom:6px}
+  .card{background:var(--card);border:1px solid #F2E7D6;border-radius:24px;box-shadow:0 10px 26px -18px rgba(120,80,40,.4)}
+  @media (max-width:720px){ .h1{font-size:22px} .wrap{padding:18px 14px 80px} }
+  @keyframes hdPop{0%{transform:scale(.85);opacity:.4}55%{transform:scale(1.03)}100%{transform:scale(1);opacity:1}}
+  @keyframes hdFloat{0%{transform:translateY(0) scale(.5) rotate(0);opacity:0}12%{opacity:1}100%{transform:translateY(-160px) scale(1) rotate(140deg);opacity:0}}
+  @keyframes hdGlow{0%,100%{opacity:.3;transform:scale(1)}50%{opacity:.6;transform:scale(1.05)}}
+  .hero{position:relative;display:flex;align-items:center;gap:34px;background:linear-gradient(120deg,#FFFFFF,#FFF5EA);border:1px solid #F2E7D6;border-radius:28px;padding:28px 36px;box-shadow:0 14px 38px -20px rgba(120,80,40,.45);overflow:hidden}
+  .grid2{display:grid;grid-template-columns:1.4fr 1fr;gap:24px;align-items:start;margin-top:24px}
+  .task{display:flex;align-items:center;gap:14px;border-radius:18px;padding:15px 18px;min-height:60px;cursor:pointer}
+  .task .ck{width:28px;height:28px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+  .rm{border:none;background:transparent;color:#D8C9B4;font-size:18px;cursor:pointer;padding:4px;line-height:1}
+  .cal{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+  .cell{aspect-ratio:1;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px}
+  @media (max-width:720px){ .hero{flex-direction:column;text-align:center;gap:20px;padding:22px} .grid2{grid-template-columns:1fr} }
+  @keyframes hdBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+  @keyframes beatPulse{0%{transform:scale(1);opacity:.55}100%{transform:scale(1.9);opacity:0}}
+  .drumwrap{max-width:880px;margin:0 auto}
+  .ex{border-radius:18px;padding:16px 18px;margin-bottom:10px}
+  .tool{background:#FFFDF8;border:1.5px solid #EBDECB;border-radius:20px;padding:18px}
+  .pill{display:inline-flex;align-items:center;gap:7px;border-radius:999px;padding:6px 12px;font-size:12px;font-weight:800}
+  .roundbtn{border:none;border-radius:14px;cursor:pointer;font-weight:700;font-size:15px;padding:11px 18px;color:#fff}
+  @media (max-width:720px){ .drumtools{grid-template-columns:1fr !important} }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo grad"><span></span></div>
+        <div>
+          <div class="eyebrow" id="hdr-date"></div>
+          <div class="h1 fred" id="hdr-title">Hi, luvie</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <div class="nav" id="nav"></div>
+        <div style="position:relative">
+          <button class="iconbtn" id="backup-btn" aria-label="Backup">
+            <span style="display:block;width:18px;height:2.5px;border-radius:2px;background:#9C8B79;box-shadow:0 6px 0 #9C8B79,0 -6px 0 #9C8B79"></span>
+          </button>
+          <div class="menu" id="backup-menu" style="display:none">
+            <div class="eyebrow" style="padding:4px 8px 8px">Backup &amp; restore</div>
+            <button id="export-btn">Export progress</button>
+            <button id="import-btn">Import from file</button>
+            <input id="import-input" type="file" accept="application/json,.json" style="display:none">
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="app"></div>
+  </div>
+
+<script src="logic.js"></script>
+<script src="workout-curriculum.js"></script>
+<script>
+(function(){
+  var L = window.Logic, CUR = window.CURRICULUM;
+  function el(){ return window.el.apply(null, arguments); }
+  var COLORS = ['#F2A07B','#F6C56B','#9FD3B4','#97C2E0','#C5B2E6','#F2A6C2'];
+  var addingTask = false, newTaskText = '';
+
+  function ring(pct, celebrate, counterLabel){
+    var C = 527.79, off = C * (1 - Math.min(100,pct)/100);
+    var box = el('div',{ style:'position:relative;width:208px;height:208px;flex-shrink:0' });
+    if (celebrate) box.appendChild(el('div',{ style:'position:absolute;inset:6px;border-radius:50%;background:radial-gradient(circle,rgba(246,197,107,.5),rgba(159,211,180,0) 70%);animation:hdGlow 2.6s ease-in-out infinite' }));
+    var svg = '<svg viewBox="0 0 200 200" style="width:208px;height:208px;display:block;position:relative">'
+      + '<defs><linearGradient id="rc" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F2A07B"/><stop offset="1" stop-color="#F6C56B"/></linearGradient>'
+      + '<linearGradient id="rg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6FBF93"/><stop offset="1" stop-color="#F6C56B"/></linearGradient></defs>'
+      + '<circle cx="100" cy="100" r="84" fill="none" stroke="#F0E7D7" stroke-width="18"></circle>'
+      + '<circle cx="100" cy="100" r="84" fill="none" stroke="url(#'+(celebrate?'rg':'rc')+')" stroke-width="18" stroke-linecap="round" stroke-dasharray="527.79" stroke-dashoffset="'+off+'" transform="rotate(-90 100 100)" style="transition:stroke-dashoffset .75s cubic-bezier(.2,.8,.2,1)"></circle></svg>';
+    box.appendChild(el('div',{ html: svg }));
+    box.appendChild(el('div',{ style:'position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none' },[
+      el('div',{ class:'fred', style:'font-weight:700;font-size:54px;line-height:1' },[counterLabel]),
+      el('div',{ class:'eyebrow', style:'margin-top:4px' },['complete'])
+    ]));
+    return box;
+  }
+
+  function confetti(){
+    var wrap = el('div',{ style:'position:absolute;inset:0;pointer-events:none;overflow:visible;z-index:4' });
+    for (var i=0;i<16;i++){
+      wrap.appendChild(el('span',{ style:'position:absolute;left:'+(5+i*5.8)+'%;top:4%;width:9px;height:9px;border-radius:'+(i%2?'50%':'2px')+';background:'+COLORS[i%6]+';opacity:0;animation:hdFloat '+(2.2+(i%4)*0.5)+'s ease-in '+((i%6)*0.3)+'s infinite' }));
+    }
+    return wrap;
+  }
+
+  function taskRow(day, n){
+    var done = n.done;
+    var row = el('div',{ class:'task', style: done
+      ? 'background:linear-gradient(135deg,#FBEEE4,#FCF4E6);border:1.5px solid #F3DCC4;animation:hdPop .3s ease'
+      : 'background:#fff;border:1.5px solid #EFE5D4;box-shadow:0 6px 16px -12px rgba(120,80,40,.4)',
+      onClick: function(){ App.set(toggleNeed(App.state, App.today(), n)); }
+    },[
+      el('div',{ class: done ? 'ck grad' : 'ck', style: done ? 'box-shadow:0 4px 10px -4px rgba(242,160,123,.8)' : 'border:2.5px solid #E7B894', html: done ? '<span style="color:#fff;font-size:15px;font-weight:900">✓</span>' : '' }),
+      el('div',{ style:'flex:1;font-weight:700;font-size:16px;color:'+(done?'#A2937F':'#4B4139')+';'+(done?'text-decoration:line-through;text-decoration-color:#E0C9AE':'') },[n.label]),
+      n.source === 'adhoc' ? el('button',{ class:'rm', 'aria-label':'Remove', onClick:function(e){ e.stopPropagation(); App.set(L.removeNeed(App.state, App.today(), n.id)); } },['×']) : null
+    ]);
+    return row;
+  }
+
+  function toggleNeed(state, dayKey, n){
+    if (n.link === 'drum') return L.setWorkoutComplete(state, dayKey, !App.state.history[dayKey].drum.completed, CUR);
+    return L.updateDay(state, dayKey, function(d){ d.needs = d.needs.map(function(x){ return x.id===n.id?Object.assign({},x,{done:!x.done}):x; }); return d; });
+  }
+
+  function calendar(){
+    var now = new Date(), y = now.getFullYear(), m = now.getMonth();
+    var startDow = new Date(y,m,1).getDay(), days = new Date(y,m+1,0).getDate(), today = now.getDate();
+    var grid = el('div',{ class:'cal' });
+    for (var i=0;i<startDow;i++) grid.appendChild(el('div',{}));
+    for (var dd=1; dd<=days; dd++){
+      var key = L.dateKey(new Date(y,m,dd));
+      var perfect = App.state.history[key] && L.isPerfectDay(App.state.history[key]);
+      var isToday = dd === today;
+      var style = perfect
+        ? 'color:#fff;box-shadow:0 5px 12px -6px rgba(242,160,123,.9)'
+        : (isToday ? 'border:2px solid #E7B894;color:#C28A5C' : 'background:#F8F2E8;color:#B0A091');
+      grid.appendChild(el('div',{ class: perfect ? 'cell grad' : 'cell', style: style },[String(dd)]));
+    }
+    return el('div',{ class:'card', style:'padding:20px 18px 18px' },[
+      el('div',{ style:'display:flex;align-items:center;justify-content:space-between;margin-bottom:14px' },[
+        el('div',{ class:'fred', style:'font-weight:600;font-size:19px' },[now.toLocaleString('default',{month:'long',year:'numeric'})]),
+        el('div',{ style:'display:flex;align-items:center;gap:6px;font-size:11px;font-weight:800;color:#B0A091' },[
+          el('span',{ class:'grad', style:'width:11px;height:11px;border-radius:50%;display:inline-block' }),'Perfect' ])
+      ]),
+      el('div',{ class:'cal', style:'margin-bottom:8px' }, 'SMTWTFS'.split('').map(function(c){ return el('div',{ style:'text-align:center;font-size:11px;font-weight:800;color:#CBBBA6' },[c]); })),
+      grid
+    ]);
+  }
+
+  function wantsCard(day){
+    var per = App.state.settings.bonusPerWant;
+    var rows = day.wants.map(function(w){
+      return el('div',{ style:'cursor:pointer;margin-bottom:8px' , onClick: function(){ App.set(L.toggleWant(App.state, App.today(), w.id)); } },[
+        el('div',{ style:'display:flex;align-items:center;gap:12px;border-radius:16px;padding:13px 14px;'+(w.done?'background:linear-gradient(135deg,#D5EFDF,#F6EAC8);border:1.5px solid #A9DBBC':'background:rgba(255,255,255,.65);border:1.5px solid #CDE7D6') },[
+          el('div',{ class: w.done?'gradg':'', style:'width:24px;height:24px;border-radius:8px;flex-shrink:0;'+(w.done?'display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:13px':'border:2.5px solid #8FCBA6'), html: w.done?'✓':'' }),
+          el('div',{ style:'flex:1;font-weight:700;font-size:15px;color:#3E5A47' },[w.label]),
+          el('button',{ class:'rm', 'aria-label':'Remove want', onClick:function(e){ e.stopPropagation(); App.set(L.removeWant(App.state, App.today(), w.label)); } },['×']),
+          el('div',{ style:'font-weight:800;font-size:13px;color:#6FBF93' },['+'+per+'%'])
+        ])
+      ]);
+    });
+    var addRow = el('div',{ style:'display:flex;gap:8px;margin-top:4px' },[
+      el('input',{ id:'want-input', placeholder:'Add a want…', style:'flex:1;border:1.5px solid #B6DEC4;background:#fff;border-radius:14px;padding:11px 13px;font-family:inherit;font-weight:700;font-size:14px;color:#3E5A47;outline:none',
+        onKeydown:function(e){ if(e.key==='Enter'){ var v=e.target.value; if(v.trim()){ App.set(L.addWant(App.state, App.today(), v)); } } } }),
+      el('button',{ class:'gradg', style:'border:none;color:#fff;font-weight:700;padding:0 16px;border-radius:14px;cursor:pointer', onClick:function(){ var inp=document.getElementById('want-input'); if(inp.value.trim()){ App.set(L.addWant(App.state, App.today(), inp.value)); } } },['Add'])
+    ]);
+    return el('div',{ style:'background:linear-gradient(135deg,#EAF6EE,#FBF3DD);border:1.5px dashed #B6DEC4;border-radius:24px;padding:20px 18px 16px' },[
+      el('div',{ style:'margin-bottom:12px' },[
+        el('div',{ class:'fred', style:'font-weight:600;font-size:19px;color:#3E5A47' },['★ Bonus round']),
+        el('div',{ style:'font-size:13px;font-weight:600;color:#6E8E78;margin-top:3px' },['Optional wins that push you past 100%'])
+      ])
+    ].concat(rows).concat([addRow]));
+  }
+
+  function tasksColumn(day){
+    var col = el('div',{});
+    var doneN = L.doneNeedsCount(day), totalN = L.totalNeeds(day);
+    col.appendChild(el('div',{ style:'display:flex;align-items:baseline;justify-content:space-between;margin:2px 4px 14px' },[
+      el('div',{ class:'fred', style:'font-weight:600;font-size:21px' },["Today's tasks"]),
+      el('div',{ style:'font-weight:800;font-size:14px;color:#B0A091' },[doneN+'/'+totalN+' done'])
+    ]));
+    day.needs.forEach(function(n){ col.appendChild(taskRow(day, n)); });
+    if (addingTask){
+      col.appendChild(el('div',{ style:'display:flex;gap:8px;margin-top:2px' },[
+        el('input',{ id:'task-input', value:newTaskText, placeholder:'New task…', style:'flex:1;border:1.5px solid #E7B894;background:#FFFDF8;border-radius:16px;padding:14px 16px;font-family:inherit;font-weight:700;font-size:15px;outline:none',
+          onInput:function(e){ newTaskText=e.target.value; }, onKeydown:function(e){ if(e.key==='Enter'){ commitTask(); } else if(e.key==='Escape'){ addingTask=false; newTaskText=''; window.renderAll(); } } }),
+        el('button',{ class:'grad', style:'border:none;color:#fff;font-weight:600;padding:0 20px;border-radius:16px;cursor:pointer', onClick:commitTask },['Add']),
+        el('button',{ style:'border:1.5px solid #EFE5D4;background:#fff;color:#A2937F;font-weight:700;padding:0 16px;border-radius:16px;cursor:pointer', onClick:function(){ addingTask=false; newTaskText=''; window.renderAll(); } },['✕'])
+      ]));
+    } else {
+      col.appendChild(el('button',{ style:'width:100%;border:2px dashed #E2CBB0;background:transparent;border-radius:18px;padding:15px;font-family:\'Fredoka\';font-weight:500;font-size:16px;color:#C29A75;cursor:pointer;margin-top:2px',
+        onClick:function(){ addingTask=true; newTaskText=''; window.renderAll(); var i=document.getElementById('task-input'); if(i) i.focus(); } },['+ Add task for today']));
+    }
+    return col;
+  }
+  function commitTask(){ var v=(newTaskText||'').trim(); if(!v) return; addingTask=false; newTaskText=''; App.set(L.addAdhocNeed(App.state, App.today(), v)); }
+
+  window.renderToday = function(){
+    var day = App.state.history[App.today()];
+    var pct = L.computeNeedsPct(day), per = App.state.settings.bonusPerWant;
+    var bonus = L.computeBonus(day, per), counter = L.counterValue(day, per), celebrate = pct >= 100;
+    var doneN = L.doneNeedsCount(day), totalN = L.totalNeeds(day);
+    var statusText = (pct>=100 && bonus>0) ? ('Overachiever — '+counter+'% today!') : (pct>=100 ? 'Perfect day complete' : (doneN+' of '+totalN+' done — keep going'));
+
+    var hero = el('div',{ class:'hero' },[
+      celebrate ? confetti() : null,
+      ring(pct, celebrate, counter+'%'),
+      el('div',{ style:'flex:1;min-width:0' },[
+        el('div',{ class:'eyebrow' },["Today's progress"]),
+        el('div',{ class:'fred', style:'font-weight:700;font-size:30px;line-height:1.15;margin-top:4px' },[statusText]),
+        el('div',{ style:'font-size:15px;font-weight:700;color:#9C8E7F;margin-top:6px' },[doneN+' of '+totalN+' daily tasks checked off']),
+        bonus>0 ? el('div',{ class:'gradg', style:'display:inline-flex;align-items:center;gap:8px;margin-top:14px;color:#3C5A45;font-weight:800;font-size:14px;padding:8px 16px;border-radius:999px' },['★ +'+bonus+'% bonus earned']) : null
+      ])
+    ]);
+
+    return el('div',{},[ hero, el('div',{ class:'grid2' },[ tasksColumn(day), el('div',{ style:'display:flex;flex-direction:column;gap:24px' },[ wantsCard(day), calendar() ]) ]) ]);
+  };
+  window.resetTodayAddState = function(){ addingTask = false; newTaskText = ''; };
+})();
+</script>
+<script>
+(function(){
+  // ---- Web Audio metronome with look-ahead scheduling ----
+  var ctx = null, nextNoteTime = 0, beat = 0, timerId = null;
+  var Metro = window.Metronome = { bpm: 80, running: false, onBeat: null };
+  function scheduleClick(time, accent){
+    var osc = ctx.createOscillator(), gain = ctx.createGain();
+    osc.frequency.value = accent ? 1500 : 1000;
+    gain.gain.setValueAtTime(0.0001, time);
+    gain.gain.exponentialRampToValueAtTime(accent ? 0.6 : 0.35, time + 0.001);
+    gain.gain.exponentialRampToValueAtTime(0.0001, time + 0.05);
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.start(time); osc.stop(time + 0.06);
+  }
+  function scheduler(){
+    while (nextNoteTime < ctx.currentTime + 0.1){
+      var accent = (beat % 4) === 0;
+      scheduleClick(nextNoteTime, accent);
+      var when = nextNoteTime, b = beat;
+      setTimeout(function(){ if (Metro.onBeat) Metro.onBeat(b % 4); }, Math.max(0,(when - ctx.currentTime))*1000);
+      nextNoteTime += 60 / Metro.bpm;
+      beat = (beat + 1) % 4;
+    }
+    timerId = setTimeout(scheduler, 25);
+  }
+  Metro.setBpm = function(v){ Metro.bpm = Math.max(40, Math.min(220, v|0)); App.state.settings.metronomeBpm = Metro.bpm; App.save(); };
+  Metro.toggle = function(){
+    if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
+    if (ctx.state === 'suspended') ctx.resume();
+    if (Metro.running){ Metro.running = false; clearTimeout(timerId); }
+    else { Metro.running = true; beat = 0; nextNoteTime = ctx.currentTime + 0.05; scheduler(); }
+  };
+
+  // ---- Count-up practice timer ----
+  var Timer = window.Timer = { running: false, elapsedMs: 0, _start: 0, _tick: null, onTick: null };
+  Timer.toggle = function(){
+    if (Timer.running){ Timer.running = false; Timer.elapsedMs += Date.now() - Timer._start; clearInterval(Timer._tick); }
+    else { Timer.running = true; Timer._start = Date.now(); Timer._tick = setInterval(function(){ if (Timer.onTick) Timer.onTick(); }, 250); }
+  };
+  Timer.reset = function(){ Timer.running = false; Timer.elapsedMs = 0; clearInterval(Timer._tick); if (Timer.onTick) Timer.onTick(); };
+  Timer.display = function(){ var ms = Timer.elapsedMs + (Timer.running ? Date.now()-Timer._start : 0); var s = Math.floor(ms/1000); return (Math.floor(s/60)) + ':' + (s%60<10?'0':'') + (s%60); };
+})();
+</script>
+<script>
+(function(){
+  var L = window.Logic, CUR = window.CURRICULUM;
+
+  function metronomeTool(){
+    var Metro = window.Metronome; if (!Metro.bpm) Metro.bpm = App.state.settings.metronomeBpm || 80;
+    var bpmLabel = el('div',{ class:'fred', style:'font-weight:700;font-size:40px;line-height:1' },[String(Metro.bpm)]);
+    var dot = el('div',{ style:'position:relative;width:46px;height:46px;border-radius:50%;border:3px solid #F2C9A8;display:flex;align-items:center;justify-content:center' });
+    var pulse = el('div',{ style:'position:absolute;inset:0;border-radius:50%;background:#F2A07B;opacity:0' });
+    dot.appendChild(pulse);
+    Metro.onBeat = function(b){ pulse.style.animation='none'; void pulse.offsetWidth; pulse.style.background = b===0 ? '#F2A07B' : '#F6C56B'; pulse.style.animation='beatPulse .25s ease-out'; };
+    function setBpm(v){ Metro.setBpm(v); bpmLabel.textContent = String(Metro.bpm); }
+    var startBtn = el('button',{ class:'roundbtn grad', onClick:function(){ Metro.toggle(); startBtn.textContent = Metro.running?'Stop':'Start'; } },[Metro.running?'Stop':'Start']);
+    return el('div',{ class:'tool' },[
+      el('div',{ class:'eyebrow', style:'margin-bottom:10px' },['Metronome']),
+      el('div',{ style:'display:flex;align-items:center;gap:16px' },[ bpmLabel, el('div',{ style:'font-weight:700;color:#9C8E7F' },['BPM']), dot ]),
+      el('input',{ type:'range', min:'40', max:'220', value:String(Metro.bpm), style:'width:100%;margin:14px 0', onInput:function(e){ setBpm(+e.target.value); } }),
+      el('div',{ style:'display:flex;gap:8px' },[
+        el('button',{ class:'roundbtn', style:'background:#F0E6D4;color:#7A6E62', onClick:function(){ setBpm(Metro.bpm-1); } },['−']),
+        el('button',{ class:'roundbtn', style:'background:#F0E6D4;color:#7A6E62', onClick:function(){ setBpm(Metro.bpm+1); } },['+']),
+        startBtn
+      ])
+    ]);
+  }
+
+  function timerTool(){
+    var T = window.Timer;
+    var disp = el('div',{ class:'fred', style:'font-weight:700;font-size:40px;line-height:1' },[T.display()]);
+    T.onTick = function(){ disp.textContent = T.display(); };
+    var startBtn = el('button',{ class:'roundbtn grad', onClick:function(){ T.toggle(); startBtn.textContent = T.running?'Pause':'Start'; } },[T.running?'Pause':'Start']);
+    return el('div',{ class:'tool' },[
+      el('div',{ class:'eyebrow', style:'margin-bottom:10px' },['Practice timer']),
+      disp,
+      el('div',{ style:'display:flex;gap:8px;margin-top:14px' },[ startBtn, el('button',{ class:'roundbtn', style:'background:#F0E6D4;color:#7A6E62', onClick:function(){ T.reset(); startBtn.textContent='Start'; } },['Reset']) ])
+    ]);
+  }
+
+  function exerciseCard(day, ex){
+    var done = day.drum.exercises[ex.id] === true;
+    var tempo = L.exerciseTempo(App.state.drumProgress.tempos, ex);
+    var target = [];
+    if (tempo != null) target.push(tempo + ' BPM');
+    if (ex.durationMin) target.push(ex.durationMin + ' min');
+    if (ex.reps) target.push(ex.reps + ' reps');
+    var demo = ex.demoUrl || ('https://www.youtube.com/results?search_query=' + encodeURIComponent(ex.name + ' drum lesson'));
+    return el('div',{ class:'ex', style: done ? 'background:linear-gradient(135deg,#EEF8F1,#FBF4E2);border:1.5px solid #C5E6D1' : 'background:#fff;border:1.5px solid #EFE5D4;box-shadow:0 6px 16px -12px rgba(120,80,40,.4)' },[
+      el('div',{ style:'display:flex;align-items:flex-start;gap:14px' },[
+        el('div',{ class: done?'ck gradg':'', style:'width:28px;height:28px;border-radius:50%;flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;'+(done?'color:#fff;font-weight:900':'border:2.5px solid #E7B894'), html: done?'✓':'', onClick:function(){ App.set(L.toggleExercise(App.state, App.today(), ex.id, CUR)); } }),
+        el('div',{ style:'flex:1' },[
+          el('div',{ class:'fred', style:'font-weight:600;font-size:17px;color:'+(done?'#3E5A47':'#4B4139') },[ex.name]),
+          el('div',{ style:'font-size:14px;font-weight:600;color:#8A7B6B;margin-top:4px' },[ex.instructions]),
+          el('div',{ style:'display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-top:10px' },[
+            target.length ? el('span',{ class:'pill', style:'background:#FBEEE2;color:#C2855B' },['Goal · '+target.join(' · ')]) : null,
+            el('a',{ href:demo, target:'_blank', rel:'noopener', style:'font-weight:800;font-size:13px;color:#C2855B;text-decoration:none' },['▶ Watch demo'])
+          ])
+        ])
+      ])
+    ]);
+  }
+
+  function stagePath(){
+    var dp = App.state.drumProgress, cc = dp.stageIndex;
+    var path = CUR.map(function(st, i){
+      var done = i < cc, current = i === cc;
+      var dotStyle = done ? 'background:linear-gradient(135deg,#6FBF93,#9FD3B4);color:#fff'
+        : current ? 'background:linear-gradient(135deg,#F2A07B,#F6C56B);color:#fff;box-shadow:0 0 0 5px rgba(242,160,123,.22)'
+        : 'background:#EDE3D3;color:#BFAE99';
+      return el('div',{ style:'display:flex;gap:14px' },[
+        el('div',{ style:'display:flex;flex-direction:column;align-items:center;width:38px;flex-shrink:0' },[
+          el('div',{ style:'width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;'+dotStyle, html: done?'✓':(current?String(i+1):'🔒') }),
+          i < CUR.length-1 ? el('div',{ style:'width:3px;flex:1;min-height:26px;background:#EBDFCD;border-radius:2px;margin:6px 0' }) : null
+        ]),
+        el('div',{ style:'flex:1;padding-bottom:14px;opacity:'+(i>cc?'.7':'1') },[
+          el('div',{ class:'fred', style:'font-weight:600;font-size:17px;color:'+(i>cc?'#A99A86':'#4B4139') },[st.title + (current?' · now':'')]),
+          el('div',{ style:'font-size:13px;font-weight:600;color:#9C8E7F;margin-top:2px' },[st.desc])
+        ])
+      ]);
+    });
+    return el('div',{ class:'card', style:'padding:20px 18px;margin-top:22px' },[ el('div',{ class:'eyebrow', style:'margin-bottom:14px' },['Your journey']) ].concat(path));
+  }
+
+  function el(){ return window.el.apply(null, arguments); }
+
+  window.renderDrums = function(){
+    var day = App.state.history[App.today()];
+    var dp = App.state.drumProgress, stage = L.currentStage(CUR, dp.stageIndex);
+    var streak = L.computeStreak(App.state.history, App.today());
+    var complete = day.drum.completed;
+
+    var header = el('div',{ class:'card', style:'padding:22px 26px;background:linear-gradient(120deg,#FFFFFF,#FFF5EA)' },[
+      el('div',{ style:'display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap' },[
+        el('div',{},[
+          el('div',{ class:'eyebrow' },['Stage '+(dp.stageIndex+1)+' of '+CUR.length+(complete?' · done today':'')]),
+          el('div',{ class:'fred', style:'font-weight:700;font-size:26px;margin-top:2px' },[stage.title])
+        ]),
+        el('div',{ style:'text-align:center' },[
+          el('div',{ class:'fred grad', style:'font-weight:700;font-size:34px;-webkit-background-clip:text;background-clip:text;color:transparent' },['🔥 '+streak]),
+          el('div',{ class:'eyebrow' },['day streak'])
+        ])
+      ])
+    ]);
+
+    var tools = el('div',{ class:'drumtools', style:'display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px' },[ metronomeTool(), timerTool() ]);
+
+    var workout = el('div',{ style:'margin-top:18px' },[
+      el('div',{ class:'fred', style:'font-weight:600;font-size:21px;margin:0 2px 12px' },["Today's workout"]) ]
+      .concat(stage.exercises.map(function(ex){ return exerciseCard(day, ex); })));
+
+    return el('div',{ class:'drumwrap' },[ header, tools, workout, stagePath() ]);
+  };
+})();
+</script>
+<script>
+(function(){
+  var L = window.Logic, CUR = window.CURRICULUM;
+  var App = window.App = {
+    screen: 'today',
+    state: null,
+    load: function(){
+      var raw = null;
+      try { raw = localStorage.getItem(L.KEY); } catch(e){}
+      var s = raw ? L.deserialize(raw) : { ok:false };
+      this.state = s.ok ? s.state : L.createInitialState();
+      this.state = L.ensureDay(this.state, L.todayKey(), CUR);
+      this.save();
+    },
+    save: function(){
+      try { localStorage.setItem(L.KEY, L.serialize(this.state)); } catch(e){}
+    },
+    set: function(newState){ this.state = newState; this.save(); this.render(); },
+    today: function(){ return L.todayKey(); },
+    render: function(){ renderAll(); }
+  };
+
+  function el(tag, attrs, children){
+    var n = document.createElement(tag);
+    attrs = attrs || {};
+    Object.keys(attrs).forEach(function(k){
+      if (k === 'style') n.setAttribute('style', attrs[k]);
+      else if (k === 'class') n.className = attrs[k];
+      else if (k === 'html') n.innerHTML = attrs[k];
+      else if (k.indexOf('on') === 0 && typeof attrs[k] === 'function') n.addEventListener(k.slice(2).toLowerCase(), attrs[k]);
+      else if (attrs[k] != null) n.setAttribute(k, attrs[k]);
+    });
+    (children || []).forEach(function(c){ if (c == null) return; n.appendChild(typeof c === 'string' ? document.createTextNode(c) : c); });
+    return n;
+  }
+  window.el = el;
+
+  function renderTopbar(){
+    var now = new Date();
+    document.getElementById('hdr-date').textContent = now.toLocaleDateString('default',{weekday:'long',month:'long',day:'numeric'});
+    document.getElementById('hdr-title').textContent = App.screen === 'today' ? 'Hi, luvie' : 'Drum Journey';
+    var nav = document.getElementById('nav'); nav.innerHTML = '';
+    [['today','Today'],['drums','Drums']].forEach(function(p){
+      var active = App.screen === p[0];
+      nav.appendChild(el('button', { class: active ? 'active grad' : '', onClick: function(){ App.screen = p[0]; if(window.resetTodayAddState) window.resetTodayAddState(); closeMenu(); renderAll(); } }, [p[1]]));
+    });
+  }
+
+  function closeMenu(){ document.getElementById('backup-menu').style.display = 'none'; }
+  document.getElementById('backup-btn').addEventListener('click', function(e){
+    e.stopPropagation();
+    var m = document.getElementById('backup-menu');
+    m.style.display = m.style.display === 'none' ? 'block' : 'none';
+  });
+  document.addEventListener('click', closeMenu);
+  document.getElementById('backup-menu').addEventListener('click', function(e){ e.stopPropagation(); });
+  document.getElementById('export-btn').addEventListener('click', function(){
+    var blob = new Blob([L.serialize(App.state)], { type: 'application/json' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a'); a.href = url; a.download = 'jason-daily-backup.json';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1000); closeMenu();
+  });
+  document.getElementById('import-btn').addEventListener('click', function(){ document.getElementById('import-input').click(); });
+  document.getElementById('import-input').addEventListener('change', function(e){
+    var file = e.target.files && e.target.files[0]; if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(){
+      var r = L.deserialize(reader.result);
+      if (!r.ok) { alert('That file is not a valid backup.'); return; }
+      App.set(L.ensureDay(r.state, L.todayKey(), CUR));
+    };
+    reader.readAsText(file); e.target.value = ''; closeMenu();
+  });
+
+  // Re-seed across midnight when the tab regains focus.
+  document.addEventListener('visibilitychange', function(){
+    if (!document.hidden) { App.state = L.ensureDay(App.state, L.todayKey(), CUR); App.save(); renderAll(); }
+  });
+
+  function renderAll(){
+    renderTopbar();
+    var app = document.getElementById('app'); app.innerHTML = '';
+    if (App.screen === 'today') app.appendChild(window.renderToday ? window.renderToday() : el('div',{},['Today']));
+    else app.appendChild(window.renderDrums ? window.renderDrums() : el('div',{},['Drums']));
+  }
+  window.renderAll = renderAll;
+
+  App.load(); renderAll();
+})();
+</script>
+</body>
+</html>
