@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Jason Daily</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#EFE5D4; --card:#FFFFFF; --ink:#4B4139; --muted:#9C8E7F; --faint:#C0AE9A;
+    --line:#EFE5D4; --line2:#EBDECB;
+    --coral:#F2A07B; --gold:#F6C56B; --green:#6FBF93; --green2:#9FD3B4;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:linear-gradient(180deg,#FBF6EE 0%,#F2E8D8 100%);min-height:100vh;
+    font-family:'Nunito',system-ui,-apple-system,sans-serif;color:var(--ink)}
+  .wrap{max-width:1180px;margin:0 auto;padding:26px 20px 80px}
+  .fred{font-family:'Fredoka',system-ui,sans-serif}
+  .grad{background:linear-gradient(135deg,var(--coral),var(--gold))}
+  .gradg{background:linear-gradient(135deg,var(--green),var(--green2))}
+  button{font-family:inherit}
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:26px;flex-wrap:wrap}
+  .brand{display:flex;align-items:center;gap:14px}
+  .logo{width:48px;height:48px;border-radius:15px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 18px -8px rgba(242,160,123,.9)}
+  .logo span{width:22px;height:22px;border-radius:50%;border:3px solid #fff;display:block}
+  .eyebrow{font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+  .h1{font-weight:700;font-size:26px;line-height:1.1}
+  .nav{display:flex;gap:5px;background:#FFFDF8;border:1.5px solid var(--line2);border-radius:16px;padding:5px}
+  .nav button{border:none;background:transparent;cursor:pointer;border-radius:12px;padding:9px 18px;font-size:15px;font-weight:600;color:#A99A86}
+  .nav button.active{color:#fff}
+  .iconbtn{width:46px;height:46px;border-radius:14px;border:1.5px solid var(--line2);background:#FFFDF8;cursor:pointer;display:flex;align-items:center;justify-content:center}
+  .menu{position:absolute;right:0;top:54px;width:220px;background:#FFFDF8;border:1.5px solid var(--line2);border-radius:18px;padding:10px;box-shadow:0 18px 40px -18px rgba(100,70,40,.5);z-index:30}
+  .menu button{width:100%;text-align:left;border:none;background:#F6EFE2;border-radius:12px;padding:11px 12px;font-weight:700;font-size:14px;color:var(--ink);cursor:pointer;margin-bottom:6px}
+  .card{background:var(--card);border:1px solid #F2E7D6;border-radius:24px;box-shadow:0 10px 26px -18px rgba(120,80,40,.4)}
+  @media (max-width:720px){ .h1{font-size:22px} .wrap{padding:18px 14px 80px} }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo grad"><span></span></div>
+        <div>
+          <div class="eyebrow" id="hdr-date"></div>
+          <div class="h1 fred" id="hdr-title">Hi, luvie</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <div class="nav" id="nav"></div>
+        <div style="position:relative">
+          <button class="iconbtn" id="backup-btn" aria-label="Backup">
+            <span style="display:block;width:18px;height:2.5px;border-radius:2px;background:#9C8B79;box-shadow:0 6px 0 #9C8B79,0 -6px 0 #9C8B79"></span>
+          </button>
+          <div class="menu" id="backup-menu" style="display:none">
+            <div class="eyebrow" style="padding:4px 8px 8px">Backup &amp; restore</div>
+            <button id="export-btn">Export progress</button>
+            <button id="import-btn">Import from file</button>
+            <input id="import-input" type="file" accept="application/json,.json" style="display:none">
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="app"></div>
+  </div>
+
+<script src="logic.js"></script>
+<script src="workout-curriculum.js"></script>
+<script>
+(function(){
+  var L = window.Logic, CUR = window.CURRICULUM;
+  var App = window.App = {
+    screen: 'today',
+    state: null,
+    load: function(){
+      var raw = null;
+      try { raw = localStorage.getItem(L.KEY); } catch(e){}
+      var s = raw ? L.deserialize(raw) : { ok:false };
+      this.state = s.ok ? s.state : L.createInitialState();
+      this.state = L.ensureDay(this.state, L.todayKey(), CUR);
+      this.save();
+    },
+    save: function(){
+      try { localStorage.setItem(L.KEY, L.serialize(this.state)); } catch(e){}
+    },
+    set: function(newState){ this.state = newState; this.save(); this.render(); },
+    today: function(){ return L.todayKey(); },
+    render: function(){ renderAll(); }
+  };
+
+  function el(tag, attrs, children){
+    var n = document.createElement(tag);
+    attrs = attrs || {};
+    Object.keys(attrs).forEach(function(k){
+      if (k === 'style') n.setAttribute('style', attrs[k]);
+      else if (k === 'class') n.className = attrs[k];
+      else if (k === 'html') n.innerHTML = attrs[k];
+      else if (k.indexOf('on') === 0 && typeof attrs[k] === 'function') n.addEventListener(k.slice(2).toLowerCase(), attrs[k]);
+      else if (attrs[k] != null) n.setAttribute(k, attrs[k]);
+    });
+    (children || []).forEach(function(c){ if (c == null) return; n.appendChild(typeof c === 'string' ? document.createTextNode(c) : c); });
+    return n;
+  }
+  window.el = el;
+
+  function renderTopbar(){
+    var now = new Date();
+    document.getElementById('hdr-date').textContent = now.toLocaleDateString('default',{weekday:'long',month:'long',day:'numeric'});
+    document.getElementById('hdr-title').textContent = App.screen === 'today' ? 'Hi, luvie' : 'Drum Journey';
+    var nav = document.getElementById('nav'); nav.innerHTML = '';
+    [['today','Today'],['drums','Drums']].forEach(function(p){
+      var active = App.screen === p[0];
+      nav.appendChild(el('button', { class: active ? 'active grad' : '', onClick: function(){ App.screen = p[0]; closeMenu(); renderAll(); } }, [p[1]]));
+    });
+  }
+
+  function closeMenu(){ document.getElementById('backup-menu').style.display = 'none'; }
+  document.getElementById('backup-btn').addEventListener('click', function(e){
+    e.stopPropagation();
+    var m = document.getElementById('backup-menu');
+    m.style.display = m.style.display === 'none' ? 'block' : 'none';
+  });
+  document.addEventListener('click', closeMenu);
+  document.getElementById('backup-menu').addEventListener('click', function(e){ e.stopPropagation(); });
+  document.getElementById('export-btn').addEventListener('click', function(){
+    var blob = new Blob([L.serialize(App.state)], { type: 'application/json' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a'); a.href = url; a.download = 'jason-daily-backup.json';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1000); closeMenu();
+  });
+  document.getElementById('import-btn').addEventListener('click', function(){ document.getElementById('import-input').click(); });
+  document.getElementById('import-input').addEventListener('change', function(e){
+    var file = e.target.files && e.target.files[0]; if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(){
+      var r = L.deserialize(reader.result);
+      if (!r.ok) { alert('That file is not a valid backup.'); return; }
+      App.set(L.ensureDay(r.state, L.todayKey(), CUR));
+    };
+    reader.readAsText(file); e.target.value = ''; closeMenu();
+  });
+
+  // Re-seed across midnight when the tab regains focus.
+  document.addEventListener('visibilitychange', function(){
+    if (!document.hidden) { App.state = L.ensureDay(App.state, L.todayKey(), CUR); App.save(); renderAll(); }
+  });
+
+  function renderAll(){
+    renderTopbar();
+    var app = document.getElementById('app'); app.innerHTML = '';
+    if (App.screen === 'today') app.appendChild(window.renderToday ? window.renderToday() : el('div',{},['Today']));
+    else app.appendChild(window.renderDrums ? window.renderDrums() : el('div',{},['Drums']));
+  }
+  window.renderAll = renderAll;
+
+  App.load(); renderAll();
+})();
+</script>
+</body>
+</html>
