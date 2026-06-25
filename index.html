@@ -230,6 +230,7 @@
 
     return el('div',{},[ hero, el('div',{ class:'grid2' },[ tasksColumn(day), el('div',{ style:'display:flex;flex-direction:column;gap:24px' },[ wantsCard(day), calendar() ]) ]) ]);
   };
+  window.resetTodayAddState = function(){ addingTask = false; newTaskText = ''; };
 })();
 </script>
 <script>
@@ -431,7 +432,7 @@
     var nav = document.getElementById('nav'); nav.innerHTML = '';
     [['today','Today'],['drums','Drums']].forEach(function(p){
       var active = App.screen === p[0];
-      nav.appendChild(el('button', { class: active ? 'active grad' : '', onClick: function(){ App.screen = p[0]; closeMenu(); renderAll(); } }, [p[1]]));
+      nav.appendChild(el('button', { class: active ? 'active grad' : '', onClick: function(){ App.screen = p[0]; if(window.resetTodayAddState) window.resetTodayAddState(); closeMenu(); renderAll(); } }, [p[1]]));
     });
   }
 
